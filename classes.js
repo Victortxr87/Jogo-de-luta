@@ -52,7 +52,7 @@ class LittleMonster extends Character{
 
 class BigMonster extends Character{
     constructor(){
-        super('Little Monster');
+        super('Big Monster');
         this.life = 120;
         this.attack = 16;
         this.defense = 6;
@@ -64,28 +64,85 @@ class BigMonster extends Character{
 
 class Stage {
 
-constructor(fighter1, fighter2, fighter1E1, fighter2E1) {
+constructor(fighter1, fighter2, fighter1E1, fighter2E1, logObject) {
 
     this.fighter1 = fighter1;
     this.fighter2 = fighter2;
     this.fighter1E1 = fighter1E1;
      this.fighter2E1 = fighter2E1;
+     this.log = logObject;
 }
 
 start(){
 
     this.update();
+    this.fighter1E1.querySelector('.attackButton').addEventListener('click', () => this.doAttack(this.fighter1, this.fighter2));
+    this.fighter2E1.querySelector('.attackButton').addEventListener('click', () => this.doAttack(this.fighter2, this.fighter1));
 }
 
 update() {
 
-    this.fighter1E1.querySelector('.name').innerHTML = this.fighter1.name;
+    this.fighter1E1.querySelector('.name').innerHTML = `${this.fighter1.name} - ${this.fighter1.life.toFixed(1)} HP`;
     let f1pct = (this.fighter1.life / this.fighter1.maxLife) * 100;
     this.fighter1E1.querySelector('.bar').style.width = `${f1pct}%`;
 
 
-    this.fighter2E1.querySelector('.name').innerHTML = this.fighter2.name;
+    this.fighter2E1.querySelector('.name').innerHTML = `${this.fighter2.name} - ${this.fighter2.life.toFixed(1)} HP`;
+    let f2pct = (this.fighter2.life / this.fighter2.maxLife) * 100;
+    this.fighter2E1.querySelector('.bar').style.width = `${f2pct}%`;
 
 }
+
+doAttack(attacking, attacked) {
+
+    if(attacking.life <= 0 || attacked.life <= 0) {
+
+       this.log.addMessage(`Atacando cachorro morto`);
+       return;
+    }
+    let attackFactor = (Math.random() * 2).toFixed(2);
+    let defenseFactor = (Math.random() * 2).toFixed(2);
+
+
+    let actualAttack = attacking.attack * attackFactor;
+    let actualdefense = attacked.defense * defenseFactor;
+
+    if(actualAttack > actualdefense) {
+    attacked.life -= actualAttack;
+    this.log.addMessage(`${attacking.name} Causou ${actualAttack.toFixed(2)} de dano em ${attacked.name} `);
+    } else {
+         this.log.addMessage(`${attacked.name} Conseguiu defender`);
+    }
+
+
+
+    this.update();
+
+}
+
+}
+
+class Log {
+
+    list = [];
+
+    constructor(listE1) {
+
+        this.listE1 = listE1;
+    }
+
+    addMessage(msg) {
+        this.list.push(msg);
+        this.render();
+    }
+
+    render() {
+
+        this.listE1.innerHTML = '';
+
+        for ( let i in this.list) {
+            this.listE1.innerHTML += `<li>${this.list[i]}</li>`;
+        }
+    }
 
 }
